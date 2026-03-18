@@ -1,0 +1,6 @@
+(include_subdirs qualified)
+
+(library
+ (name aiyu_webauthn)
+ (public_name aiyu_webauthn)
+ (libraries digestif yojson base64 mirage-crypto-rng x509 cbor))

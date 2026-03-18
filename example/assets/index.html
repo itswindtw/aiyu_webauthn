@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Passkey example for Aiyu_webauthn</title>
+  </head>
+  <body>
+    <h1>Passkey example for Aiyu_webauthn</h1>
+
+    <section>
+      <h2>Register</h2>
+      <input type="text" id="register-username" placeholder="Enter username" />
+      <button id="register-btn">Register with Passkey</button>
+    </section>
+
+    <section>
+      <h2>Authenticate</h2>
+      <button id="authenticate-btn">Sign In with Passkey</button>
+    </section>
+
+    <script>
+      async function register(username) {
+        // Fetch encoded options from backend
+        const optionsResponse = await fetch(
+          `/registration/options/${username}`,
+          { method: "POST" },
+        );
+        const encodedOptions = await optionsResponse.json();
+
+        // Parse encoded options
+        let options =
+          PublicKeyCredential.parseCreationOptionsFromJSON(encodedOptions);
+
+        // Create credential with WebAuthn API
+        const credential = await navigator.credentials.create({
+          publicKey: options,
+        });
+
+        // Encode and send the credential to the server for verification.
+        const registrationResponse = await fetch("/registration", {
+          method: "POST",
+          body: JSON.stringify(credential.toJSON()),
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (registrationResponse.ok) {
+          const clientExtensionResults = credential.getClientExtensionResults();
+          console.log(clientExtensionResults);
+
+          return registrationResponse.json();
+        }
+      }
+
+      async function authenticate() {
+        // Fetch encoded options from backend
+        const optionsResponse = await fetch(`/authentication/options`, {
+          method: "POST",
+        });
+        const encodedOptions = await optionsResponse.json();
+
+        // Parse encoded options
+        let options =
+          PublicKeyCredential.parseRequestOptionsFromJSON(encodedOptions);
+
+        // Authenticate credential with WebAuthn API
+        const credential = await navigator.credentials.get({
+          publicKey: options,
+        });
+
+        // Encode and send the credential to the server for verification.
+        const authenticationResponse = await fetch("/authentication", {
+          method: "POST",
+          body: JSON.stringify(credential.toJSON()),
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (authenticationResponse.ok) {
+          const clientExtensionResults = credential.getClientExtensionResults();
+          console.log(clientExtensionResults);
+
+          return authenticationResponse.json();
+        }
+      }
+
+      const registerBtn = document.getElementById("register-btn");
+      registerBtn.addEventListener("click", async () => {
+        const username = document.getElementById("register-username").value;
+        if (!username) {
+          alert("username is required");
+          return;
+        }
+
+        const result = await register(username);
+        if (result) {
+          alert("Registration completed successfully!");
+          console.log(result);
+        } else {
+          alert("Registration failed!");
+        }
+      });
+
+      const authenticateBtn = document.getElementById("authenticate-btn");
+      authenticateBtn.addEventListener("click", async () => {
+        const result = await authenticate();
+
+        if (result) {
+          alert("Authentication completed successfully!");
+          console.log(result);
+        } else {
+          alert("Authentication failed!");
+        }
+      });
+    </script>
+  </body>
+</html>

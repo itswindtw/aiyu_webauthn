@@ -1,0 +1,15 @@
+(executable
+ (name server)
+ (public_name server)
+ (libraries aiyu_webauthn dream uuidm)
+ (preprocess
+  (pps lwt_ppx)))
+
+(rule
+ (target assets.ml)
+ (deps
+  (source_tree assets))
+ (action
+  (with-stdout-to
+   %{null}
+   (run ocaml-crunch -m plain assets -o %{target}))))

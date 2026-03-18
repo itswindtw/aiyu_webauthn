@@ -1,0 +1,10 @@
+(lang dune 3.21)
+(name aiyu_webauthn_example)
+(package
+  (name aiyu_webauthn_example)
+  (depends
+    ocaml
+    aiyu_webauthn
+    dream
+    crunch
+    uuidm))
