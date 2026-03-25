@@ -3,7 +3,7 @@ type t = {
   flags : Flags.t;
   sign_count : Int32.t;
   attested_credential_data : Attestation_credential_data.t option;
-  extensions : CBOR.Simple.t option;
+  extensions : Cbor.t option;
 }
 
 let of_string s =
@@ -17,10 +17,10 @@ let of_string s =
       let aaguid = String.sub rest 0 16 in
       let credential_id_length = String.get_uint16_be rest 16 in
       let credential_id = String.sub rest 18 credential_id_length in
-      let credential_public_key, rest =
+      let* credential_public_key, rest =
         let pos = 18 + credential_id_length in
         let sub = String.sub rest pos (String.length rest - pos) in
-        CBOR.Simple.decode_partial sub
+        Cbor.decode_item sub
       in
       let* credential_public_key = Cose_key.of_cbor credential_public_key in
       Ok
@@ -36,8 +36,10 @@ let of_string s =
     end
     else Ok (None, rest)
   in
-  let extensions =
-    if flags.extension_data_included then Some (CBOR.Simple.decode rest)
-    else None
+  let* extensions =
+    if flags.extension_data_included then
+      let* cbor = Cbor.decode rest in
+      Ok (Some cbor)
+    else Ok None
   in
   Ok { rp_id_hash; flags; sign_count; attested_credential_data; extensions }

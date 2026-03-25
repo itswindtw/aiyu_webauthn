@@ -8,30 +8,30 @@ let verify_att_stmt att_stmt_fmt att_stmt (raw_auth_data, auth_data) hash =
   | Packed -> (
       let* kv =
         match att_stmt with
-        | `Map kv -> Ok kv
+        | Cbor.Map kv -> Ok kv
         | _ -> Error "att_stmt is not a map"
       in
       let* alg =
-        match List.assoc_opt (`Text "alg") kv with
-        | Some (`Int alg) -> Ok alg
+        match List.assoc_opt (Cbor.Text_string "alg") kv with
+        | Some (Integer alg) -> Ok alg
         | None -> Error "att_stmt.alg is missing"
         | _ -> Error "att_stmt.alg is not an integer"
       in
       let* sig_ =
-        match List.assoc_opt (`Text "sig") kv with
-        | Some (`Bytes sig_) -> Ok sig_
+        match List.assoc_opt (Cbor.Text_string "sig") kv with
+        | Some (Byte_string sig_) -> Ok sig_
         | None -> Error "att_stmt.sig is missing"
         | _ -> Error "att_stmt.sig is not bytes"
       in
       let* x5c =
-        match List.assoc_opt (`Text "x5c") kv with
-        | Some (`Array (_ :: _ as list)) ->
+        match List.assoc_opt (Cbor.Text_string "x5c") kv with
+        | Some (Array (_ :: _ as list)) ->
             List.fold_right
               (fun x acc ->
                 let* acc = acc in
                 let* x =
                   match x with
-                  | `Bytes bytes -> Ok bytes
+                  | Cbor.Byte_string bytes -> Ok bytes
                   | _ -> Error "att_stmt.x5c is not a bytes list"
                 in
                 Ok (x :: acc))

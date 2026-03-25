@@ -12,65 +12,65 @@ type t = { alg : int; key : key }
 let of_cbor cbor =
   let open Result.Syntax in
   let* kv =
-    match cbor with `Map kv -> Ok kv | _ -> Error "Cose_key is not a map"
+    match cbor with Cbor.Map kv -> Ok kv | _ -> Error "Cose_key is not a map"
   in
   let* kty =
-    match List.assoc_opt (`Int 1) kv with
-    | Some (`Int kty) -> Ok kty
+    match List.assoc_opt (Cbor.Integer 1) kv with
+    | Some (Integer kty) -> Ok kty
     | None -> Error "kty is missing"
     | Some _ -> Error "kty is not an integer"
   in
   let* alg =
-    match List.assoc_opt (`Int 3) kv with
-    | Some (`Int alg) -> Ok alg
+    match List.assoc_opt (Cbor.Integer 3) kv with
+    | Some (Integer alg) -> Ok alg
     | None -> Error "alg is missing"
     | Some _ -> Error "alg is not an integer"
   in
   match (alg, kty) with
   | -8, 1 ->
       let* crv =
-        match List.assoc_opt (`Int (-1)) kv with
-        | Some (`Int crv) -> Ok crv
+        match List.assoc_opt (Cbor.Integer (-1)) kv with
+        | Some (Integer crv) -> Ok crv
         | None -> Error "crv is missing"
         | Some _ -> Error "crv is not an integer"
       in
       let* x =
-        match List.assoc_opt (`Int (-2)) kv with
-        | Some (`Bytes crv) -> Ok crv
+        match List.assoc_opt (Cbor.Integer (-2)) kv with
+        | Some (Cbor.Byte_string crv) -> Ok crv
         | None -> Error "x is missing"
         | Some _ -> Error "x is not bytes"
       in
       Ok { alg; key = OKP { crv; x } }
   | -7, 2 ->
       let* crv =
-        match List.assoc_opt (`Int (-1)) kv with
-        | Some (`Int crv) -> Ok crv
+        match List.assoc_opt (Cbor.Integer (-1)) kv with
+        | Some (Integer crv) -> Ok crv
         | None -> Error "crv is missing"
         | Some _ -> Error "crv is not an integer"
       in
       let* x =
-        match List.assoc_opt (`Int (-2)) kv with
-        | Some (`Bytes x) -> Ok x
+        match List.assoc_opt (Cbor.Integer (-2)) kv with
+        | Some (Byte_string x) -> Ok x
         | None -> Error "x is missing"
         | Some _ -> Error "x is not bytes"
       in
       let* y =
-        match List.assoc_opt (`Int (-3)) kv with
-        | Some (`Bytes y) -> Ok y
+        match List.assoc_opt (Cbor.Integer (-3)) kv with
+        | Some (Byte_string y) -> Ok y
         | None -> Error "y is missing"
         | Some _ -> Error "y is not bytes"
       in
       Ok { alg; key = EC2 { crv; x; y } }
   | -257, 3 ->
       let* n =
-        match List.assoc_opt (`Int (-1)) kv with
-        | Some (`Bytes n) -> Ok n
+        match List.assoc_opt (Cbor.Integer (-1)) kv with
+        | Some (Byte_string n) -> Ok n
         | None -> Error "n is missing"
         | Some _ -> Error "n is not bytes"
       in
       let* e =
-        match List.assoc_opt (`Int (-2)) kv with
-        | Some (`Bytes e) -> Ok e
+        match List.assoc_opt (Cbor.Integer (-2)) kv with
+        | Some (Byte_string e) -> Ok e
         | None -> Error "e is missing"
         | Some _ -> Error "e is not bytes"
       in
