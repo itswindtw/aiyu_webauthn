@@ -1,4 +1,4 @@
-open Aiyu_webauthn
+open Lokto_webauthn
 
 let rp_id = "example.org"
 let origin = "https://example.org"
@@ -616,7 +616,7 @@ let test_16_11 () =
 
 let () =
   Alcotest.(
-    run "aiyu_webauthn"
+    run "lokto_webauthn"
       [
         ( "Test Vectors",
           [

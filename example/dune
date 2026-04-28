@@ -1,7 +1,7 @@
 (executable
  (name server)
  (public_name server)
- (libraries aiyu_webauthn dream uuidm)
+ (libraries lokto_webauthn dream uuidm)
  (preprocess
   (pps lwt_ppx)))
 

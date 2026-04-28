@@ -8,7 +8,7 @@ depends: [
   "digestif"
   "mirage-crypto-rng"
   "x509"
-  "aiyu_cbor"
+  "lokto_cbor"
   "hex" {with-test}
   "alcotest" {with-test}
   "ocaml-lsp-server" {with-dev-setup}

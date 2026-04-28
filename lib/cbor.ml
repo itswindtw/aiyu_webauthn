@@ -20,4 +20,4 @@ module Int = struct
   let to_nint64 t = if t < 0 then Some (Int64.of_int (-(t + 1))) else None
 end
 
-include Aiyu_cbor.Make (Int)
+include Lokto_cbor.Make (Int)

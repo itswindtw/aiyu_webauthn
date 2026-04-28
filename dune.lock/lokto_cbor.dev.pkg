@@ -8,6 +8,6 @@
 
 (source
  (fetch
-  (url git+https://github.com/itswindtw/aiyu_cbor)))
+  (url git+https://github.com/itswindtw/lokto_cbor)))
 
 (dev)

@@ -33,7 +33,7 @@ let fetch_credential_record ~user_handle ~credential_id =
 
 (* PRF *)
 let salt =
-  Aiyu_webauthn.Spec.Base64_url_string.of_raw "Salt for new symmetric key"
+  Lokto_webauthn.Spec.Base64_url_string.of_raw "Salt for new symmetric key"
 
 let extensions =
   `Assoc
@@ -43,8 +43,9 @@ let extensions =
           [
             ( "eval",
               `Assoc
-                [ ("first", Aiyu_webauthn.Spec.Base64_url_string.to_json salt) ]
-            );
+                [
+                  ("first", Lokto_webauthn.Spec.Base64_url_string.to_json salt);
+                ] );
           ] );
     ]
 
@@ -59,7 +60,7 @@ let () =
 
              let user_id = uuid () |> Uuidm.to_binary_string in
              let authenticator_selection =
-               Aiyu_webauthn.Spec.Authenticator_selection_criteria.
+               Lokto_webauthn.Spec.Authenticator_selection_criteria.
                  {
                    resident_key = Some Required;
                    authenticator_attachment = None;
@@ -67,19 +68,19 @@ let () =
                  }
              in
              let options =
-               Aiyu_webauthn.Registration.Options.make ~rp_id ~user_id
+               Lokto_webauthn.Registration.Options.make ~rp_id ~user_id
                  ~user_name ~authenticator_selection ~extensions ()
              in
 
              let%lwt () =
                Dream.set_session_field request "challenge"
-                 (Aiyu_webauthn.Spec.Base64_url_string.to_raw options.challenge)
+                 (Lokto_webauthn.Spec.Base64_url_string.to_raw options.challenge)
              in
              let%lwt () = Dream.set_session_field request "user_id" user_id in
 
              Dream.json
-               (options |> Aiyu_webauthn.Registration.Options.to_json
-              |> Aiyu_webauthn.Json.to_string));
+               (options |> Lokto_webauthn.Registration.Options.to_json
+              |> Lokto_webauthn.Json.to_string));
          Dream.post "/registration" (fun request ->
              match
                ( Dream.session_field request "user_id",
@@ -89,11 +90,11 @@ let () =
              | Some user_id, Some challenge -> (
                  let%lwt registration_response = Dream.body request in
                  let challenge =
-                   Aiyu_webauthn.Spec.Base64_url_string.of_raw challenge
+                   Lokto_webauthn.Spec.Base64_url_string.of_raw challenge
                  in
 
                  match
-                   Aiyu_webauthn.Registration.Response.verify
+                   Lokto_webauthn.Registration.Response.verify
                      ~registration_response ~challenge ~rp_id ~check_origin
                      ~check_attestation:(fun ~attestation_type ~trust_path ->
                        true)
@@ -113,19 +114,19 @@ let () =
                           [
                             ( "credential_id",
                               `String
-                                Aiyu_webauthn.Spec.Base64_url_string.(
+                                Lokto_webauthn.Spec.Base64_url_string.(
                                   credential_record.id |> of_raw |> to_encoded)
                             );
                             ( "user_id",
                               `String
-                                Aiyu_webauthn.Spec.Base64_url_string.(
+                                Lokto_webauthn.Spec.Base64_url_string.(
                                   user_id |> of_raw |> to_encoded) );
                           ]
                        |> Yojson.to_string)
                  | Error msg -> Dream.html ~status:`Bad_Request msg));
          Dream.post "/authentication/options" (fun request ->
              let options =
-               Aiyu_webauthn.Authentication.Options.make ~rp_id
+               Lokto_webauthn.Authentication.Options.make ~rp_id
                  ~user_verification:Preferred ~allow_credentials:[] ~extensions
                  ()
              in
@@ -133,22 +134,22 @@ let () =
              let%lwt () =
                Dream.set_session_field request "challenge"
                  (options.challenge
-                |> Aiyu_webauthn.Spec.Base64_url_string.to_raw)
+                |> Lokto_webauthn.Spec.Base64_url_string.to_raw)
              in
 
              Dream.json
-               (options |> Aiyu_webauthn.Authentication.Options.to_json
-              |> Aiyu_webauthn.Json.to_string));
+               (options |> Lokto_webauthn.Authentication.Options.to_json
+              |> Lokto_webauthn.Json.to_string));
          Dream.post "/authentication" (fun request ->
              match Dream.session_field request "challenge" with
              | None -> Dream.empty `Bad_Request
              | Some challenge -> (
                  let%lwt authentication_response = Dream.body request in
                  let challenge =
-                   Aiyu_webauthn.Spec.Base64_url_string.of_raw challenge
+                   Lokto_webauthn.Spec.Base64_url_string.of_raw challenge
                  in
                  match
-                   Aiyu_webauthn.Authentication.Response.verify
+                   Lokto_webauthn.Authentication.Response.verify
                      ~authentication_response ~challenge ~rp_id
                      ~fetch_credential_record ~check_origin ~allow_cross_origin
                      ~require_user_verification ()
@@ -162,14 +163,14 @@ let () =
                           [
                             ( "credential_id",
                               `String
-                                Aiyu_webauthn.Spec.Base64_url_string.(
+                                Lokto_webauthn.Spec.Base64_url_string.(
                                   credential_record.id |> of_raw |> to_encoded)
                             );
                             ( "user_id",
                               Option.fold ~none:`Null
                                 ~some:(fun x ->
                                   `String
-                                    Aiyu_webauthn.Spec.Base64_url_string.(
+                                    Lokto_webauthn.Spec.Base64_url_string.(
                                       x |> of_raw |> to_encoded))
                                 user_handle );
                           ]

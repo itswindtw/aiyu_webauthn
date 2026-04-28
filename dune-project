@@ -1,11 +1,11 @@
 (lang dune 3.21)
 
-(name aiyu_webauthn)
+(name lokto_webauthn)
 
 (generate_opam_files true)
 
 (package
-  (name aiyu_webauthn)
+  (name lokto_webauthn)
   (depends
     ocaml
     yojson
@@ -13,13 +13,13 @@
     digestif
     mirage-crypto-rng
     x509
-    aiyu_cbor
+    lokto_cbor
     (hex :with-test)
     (alcotest :with-test)
     (ocaml-lsp-server :with-dev-setup)
     (ocamlformat :with-dev-setup)))
 
 (pin
-  (url "git+https://github.com/itswindtw/aiyu_cbor")
+  (url "git+https://github.com/itswindtw/lokto_cbor")
   (package
-    (name aiyu_cbor)))
+    (name lokto_cbor)))

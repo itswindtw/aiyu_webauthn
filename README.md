@@ -1,4 +1,4 @@
-# Aiyu_webauthn
+# Lokto_webauthn
 
 An OCaml webauthn implementation from scratch.
 

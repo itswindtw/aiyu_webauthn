@@ -1,10 +1,10 @@
 (lang dune 3.21)
-(name aiyu_webauthn_example)
+(name lokto_webauthn_example)
 (package
-  (name aiyu_webauthn_example)
+  (name lokto_webauthn_example)
   (depends
     ocaml
-    aiyu_webauthn
+    lokto_webauthn
     dream
     crunch
     uuidm))
